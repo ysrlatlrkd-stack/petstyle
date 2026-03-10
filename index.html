@@ -3,119 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetStyle MVP Demo</title>
-    <style>
-        /* 별도 파일 필요 없이 이 스타일이 바로 적용됩니다 */
-        :root {
-            --primary: #2d3436;
-            --accent: #ff4757;
-            --bg: #f1f2f6;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background: var(--bg); padding-bottom: 50px; }
-        
-        .header { background: #fff; padding: 20px; text-align: center; border-bottom: 2px solid #ddd; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-
-        /* 검색 바 */
-        .search-box { 
-            background: #fff; padding: 20px; border-radius: 15px; 
-            display: flex; gap: 10px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        select, input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
-        .btn-main { background: var(--accent); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-        /* 카드 리스트 */
-        .shop-list { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card-img { width: 100%; height: 150px; background: #dfe6e9; display: flex; align-items: center; justify-content: center; color: #636e72; }
-        .card-body { padding: 15px; }
-        .tag { display: inline-block; background: #eee; padding: 3px 8px; border-radius: 5px; font-size: 12px; margin: 2px; }
-        
-        /* 모달 */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
-        .modal-content { background: #fff; padding: 30px; border-radius: 20px; width: 350px; text-align: center; }
-    </style>
+    <title>펫스타일 매칭 플랫폼</title>
+    <meta name="description" content="우리 댕댕이를 위한 완벽한 스타일, 펫스타일 미용실 매칭 플랫폼.">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    <div id="app">
+        <!-- Header -->
+        <header class="glass-header">
+            <div class="header-container">
+                <a href="#" class="logo" onclick="window.app.navigate('home')">
+                    <i class="ri-scissors-2-fill"></i> PetStyle
+                </a>
+                <nav class="nav-links">
+                    <a href="#" class="nav-link active">홈</a>
+                    <a href="#" class="nav-link">추천 매장</a>
+                    <a href="#" class="nav-link">내 주변 찾기</a>
+                    <a href="#" class="nav-link">마이페이지</a>
+                </nav>
+                <button class="btn-primary login-btn">로그인</button>
+            </div>
+        </header>
 
-<div class="header">
-    <h1 style="color: var(--accent)">PetStyle</h1>
-    <p>견종별 스타일 매칭 MVP</p>
-</div>
+        <!-- Main Content Area (Dynamic) -->
+        <main id="main-content">
+            <!-- Content will be injected by app.js -->
+        </main>
 
-<div class="container">
-    <div class="search-box">
-        <select id="breed">
-            <option value="all">견종 선택</option>
-            <option value="푸들">푸들</option>
-            <option value="비숑">비숑</option>
-            <option value="포메">포메</option>
-        </select>
-        <input type="text" id="style" placeholder="스타일 입력 (예: 곰돌이컷)">
-        <button class="btn-main" onclick="filterData()">검색</button>
-    </div>
-
-    <div class="shop-list" id="list">
-        </div>
-</div>
-
-<div id="modal" onclick="this.style.display='none'">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <h3>📅 예약 신청</h3>
-        <p id="targetName" style="margin: 15px 0; font-weight: bold;"></p>
-        <input type="date" style="width: 100%; margin-bottom: 15px;">
-        <button class="btn-main" style="width: 100%" onclick="alert('예약이 접수되었습니다.'); location.reload();">확인</button>
-    </div>
-</div>
-
-<script>
-    // 초기 데이터
-    const data = [
-        { name: "멍멍살롱", breed: "푸들", styles: ["곰돌이컷", "스포팅"], rating: 4.8 },
-        { name: "비숑나라", breed: "비숑", styles: ["하이바컷", "귀툭튀"], rating: 4.9 },
-        { name: "포메스타", breed: "포메", styles: ["물개컷", "곰돌이컷"], rating: 4.7 },
-        { name: "깔끔펫", breed: "푸들", styles: ["브로콜리컷", "기저귀컷"], rating: 4.5 }
-    ];
-
-    const listDiv = document.getElementById('list');
-
-    function render(items) {
-        listDiv.innerHTML = items.map(item => `
-            <div class="card">
-                <div class="card-img">${item.breed} 전문</div>
-                <div class="card-body">
-                    <h4>${item.name} <span style="color:orange">★${item.rating}</span></h4>
-                    <div style="margin: 10px 0;">
-                        ${item.styles.map(s => `<span class="tag">#${s}</span>`).join('')}
-                    </div>
-                    <button class="btn-main" style="width:100%; font-size:12px;" onclick="openReserve('${item.name}')">예약하기</button>
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-logo">PetStyle</div>
+                <p>소중한 반려견을 위한 최적의 미용실 매칭 서비스</p>
+                <div class="footer-links">
+                    <a href="#">이용약관</a>
+                    <a href="#">개인정보처리방침</a>
+                    <a href="#">고객센터</a>
                 </div>
             </div>
-        `).join('');
-    }
-
-    function filterData() {
-        const breedVal = document.getElementById('breed').value;
-        const styleVal = document.getElementById('style').value;
-
-        const filtered = data.filter(item => {
-            const b = breedVal === 'all' || item.breed === breedVal;
-            const s = styleVal === '' || item.styles.some(st => st.includes(styleVal));
-            return b && s;
-        });
-        render(filtered);
-    }
-
-    function openReserve(name) {
-        document.getElementById('targetName').innerText = name + " 미용 예약";
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    // 첫 화면 로드
-    render(data);
-</script>
-
+        </footer>
+    </div>
+    <script src="app.js"></script>
 </body>
 </html>
